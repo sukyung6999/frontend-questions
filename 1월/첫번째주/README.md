@@ -36,6 +36,9 @@
     1. 컨텐츠 사이즈 미리 지정 : width/height 지정 , aspect-ratio 활용
     2. 최소 공간 확보 : min-height 설정, 스켈레톤 ui 사용
     3. font-display: swap 설정
+2. 페인트 과정에서 발생할 수 있는 문제 해결할 방법
+    1. css 애니메이션은 최대한 transform과 opacity 활용
+    2. will-change : 요소의 변화를 브라우저에 미리 알려줘서 최적화할 수 있음
 
 ## 추가로 궁금했던 것들
 
