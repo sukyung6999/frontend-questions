@@ -53,3 +53,50 @@ TTI는 화면에 그려진 컨텐츠가 사용자가 사용할 수 있는 상태
 즉, FCP의 측정 기준은 화면에 컨텐츠가 그려지만 하면 되지만 TTI의 측정 기준은 화면에 그려진 것 뿐만 아니라 그 컨텐츠를 사용할 수 있어야 한다.
 
 따라서 TTI는 FCP보다 같거나 크다.
+
+## 4. 성능 최적화
+
+### 4-1. FCP 성능 최적화
+
+1. SSR
+   1. 서버에서 완성된 페이지를 브라우저에서 보옂
+2. 이미지 최적화 : 용량 압축
+3. 코드 스플리팅 : 리액트의 컴포넌트 구조가 코드를 논리적으로 분리하긴 하지만, 기본적으로 모든 컴포넌트 코드는 하나의 번들로 묶여서 전송됨
+
+   따라서, 헤더나 내비게이션과 같이 가장 먼저 보여지는 중요한 컴포넌트들을 제외하고는 필요한 시점에 코드를 로드하게 함으로써 초기 렌더링 속도를 높여줌
+
+   ```jsx
+   // 관리자 대시보드 앱의 구조라고 가정
+   import React, { lazy, Suspense } from 'react';
+   import { Routes, Route } from 'react-router-dom';
+
+   // 기본 번들에 포함되는 컴포넌트
+   import Navbar from './components/Navbar';
+   import Loading from './components/Loading';
+
+   // 코드 스플리팅 적용 - 필요할 때만 로드
+   const Dashboard = lazy(() => import('./pages/Dashboard'));
+   const UserManagement = lazy(() => import('./pages/UserManagement'));
+   const Analytics = lazy(() => import('./pages/Analytics'));
+   const Reports = lazy(() => import('./pages/Reports')); // 무거운 차트 라이브러리 포함
+
+   function App() {
+     return (
+       <>
+         <Navbar />
+         <Suspense fallback={<Loading />}>
+           <Routes>
+             <Route path="/" element={<Dashboard />} />
+             {/* /users 접속할 때만 UserManagement 코드 로드 */}
+             <Route path="/users" element={<UserManagement />} />
+             {/* /analytics 접속할 때만 차트 라이브러리 포함된 코드 로드 */}
+             <Route path="/analytics" element={<Analytics />} />
+             <Route path="/reports" element={<Reports />} />
+           </Routes>
+         </Suspense>
+       </>
+     );
+   }
+   ```
+
+### 4-2. TTI 최적화
